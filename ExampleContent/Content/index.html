@@ -1,0 +1,35 @@
+<div class="jumbotron">
+    <h1>Guppy</h1>
+    <p class="lead">Guppy is a tiny ASP.Net application that hosts CommonMark (Markdown) and HTML files from an external location, like a GitHub repository.</p>
+    <p><a href="https://github.com/jpobst/guppy" class="btn btn-primary btn-lg">Project site &raquo;</a></p>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Content</h2>
+        <p>
+            To add new content to your Guppy site, just add a new <a href="http://commonmark.org">CommonMark</a> (.md) or HTML (.html) file to you
+            Guppy Content directory.  You can also use directories to create site hierarchies.
+
+            For example, if you navigate to <b>http://mysite/about</b>, Guppy will look for your content in:
+            <ul>
+              <li>Content/about.md</li>
+              <li>Content/about.html</li>
+              <li>Content/about/index.md</li>
+              <li>Content/about/index.html</li>
+            </ul>
+        </p>
+    </div>
+    <div class="col-md-6">
+        <h2>Theming</h2>
+        <p>
+            The Theme directory is a special directory that exists outside on the Content directory.  This directory
+            contains all the files that make up the theme of your website, like <b>_Layout.cshtml</b>, <b>css/js files</b>,
+            and site-wide <b>images</b>.
+
+            This allows you to easily keep your theme separate from your content.
+
+            This directory can be accessed via <b>http://mysite/theme/</b>.
+        </p>
+    </div>
+</div>
