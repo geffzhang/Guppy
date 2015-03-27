@@ -112,11 +112,15 @@
     <Compile Include="App_Start\RedirectConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\ContentPage.cs" />
     <Compile Include="Helpers\ExternalVirtualFile.cs" />
     <Compile Include="Helpers\ExternalVirtualPathProvider.cs" />
+    <Compile Include="Helpers\Page.cs" />
+    <Compile Include="Helpers\StaticPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>

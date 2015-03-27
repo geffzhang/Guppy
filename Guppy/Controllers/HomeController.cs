@@ -40,36 +40,30 @@ namespace Guppy.Controllers
 
         private ActionResult ServeContentPage (string page)
         {
+            // If we have this file in our cache, use it
+            var cached = (ContentPage)HttpRuntime.Cache[page];
+
+            if (cached != null) {
+                Response.AddFileDependency (cached.File);
+                return View ("Index", new MvcHtmlString (cached.Content));
+            }
+
             // Find the file on disk
             var file = FindFile (page);
 
-            if (string.IsNullOrWhiteSpace (file))
+            if (file.IsNullOrWhitespace ())
                 return HttpNotFound ();
 
             EnsureRequestIsLegit (file);
 
-            // If we have this file in our cache, use it
-            var cached = (string)HttpRuntime.Cache[page];
+            cached = new ContentPage (file);
 
-            if (cached == null || cached.Length == 0) {
-                // Process the markdown or html file
-                switch (Path.GetExtension (file)) {
-                    case ".md":
-                        var file_source = System.IO.File.ReadAllText (file);
-                        cached = CommonMark.CommonMarkConverter.Convert (file_source);
-                        break;
-                    case ".html":
-                        cached = System.IO.File.ReadAllText (file);
-                        break;
-                }
-
-                // Load content into the cache for next time
-                HttpRuntime.Cache.Insert (page, cached, new CacheDependency (file));
-            }
+            // Load content into the cache for next time
+            HttpRuntime.Cache.Insert (page, cached, new CacheDependency (file));
 
             Response.AddFileDependency (file);
 
-            return View ("Index", new MvcHtmlString (cached));
+            return View ("Index", new MvcHtmlString (cached.Content));
         }
 
         private ActionResult ServeStaticFile (string page)
@@ -84,25 +78,28 @@ namespace Guppy.Controllers
             else
                 path = Path.Combine (GuppyMvcApplication.ContentDirectory, page);
 
+            // If we have this file in our cache, use it
+            var cached = (StaticPage)HttpRuntime.Cache[page];
+
+            if (cached != null) {
+                Response.AddFileDependency (path);
+                return File (cached.Content, cached.Mimetype);
+            }
+
             EnsureRequestIsLegit (path);
 
             // Make sure file exists
             if (!System.IO.File.Exists (path))
                 return HttpNotFound ();
 
-            // If we have this file in our cache, use it
-            var cached = (byte[])HttpRuntime.Cache[page];
+            // Load content into the cache for next time
+            cached = new StaticPage (path);
 
-            if (cached == null || cached.Length == 0) {
-                // Load content into the cache for next time
-                cached = System.IO.File.ReadAllBytes (path);
-
-                HttpRuntime.Cache.Insert (page, cached, new CacheDependency (path));
-            }
+            HttpRuntime.Cache.Insert (page, cached, new CacheDependency (path));
             
             Response.AddFileDependency (path);
 
-            return File (cached, MimeMapping.GetMimeMapping (page));
+            return File (cached.Content, cached.Mimetype);
         }
 
         private bool IsStaticFileRequest (string page)
