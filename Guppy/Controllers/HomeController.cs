@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Web;
 using System.Web.Caching;
@@ -8,6 +9,13 @@ namespace Guppy.Controllers
 {
     public class HomeController : Controller
     {
+        private static string default_title;
+
+        static HomeController ()
+        {
+            default_title = ConfigurationManager.AppSettings["DefaultPageTitle"];
+        }
+
         [Route ("{*page}")]
         public ActionResult HandleRequest (string page = "")
         {
@@ -44,6 +52,7 @@ namespace Guppy.Controllers
             var cached = (ContentPage)HttpRuntime.Cache[page];
 
             if (cached != null) {
+                AddPageTitle (cached);
                 Response.AddFileDependency (cached.File);
                 return View ("Index", new MvcHtmlString (cached.Content));
             }
@@ -61,9 +70,20 @@ namespace Guppy.Controllers
             // Load content into the cache for next time
             HttpRuntime.Cache.Insert (page, cached, new CacheDependency (file));
 
+            AddPageTitle (cached);
             Response.AddFileDependency (file);
 
             return View ("Index", new MvcHtmlString (cached.Content));
+        }
+
+        private void AddPageTitle (ContentPage page)
+        {
+            var title = default_title;
+
+            if (page.Variables.ContainsKey ("title"))
+                title = page.Variables["title"];
+
+            ViewBag.Title = title;
         }
 
         private ActionResult ServeStaticFile (string page)
